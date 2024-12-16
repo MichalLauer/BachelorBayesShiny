@@ -28,10 +28,6 @@ ui <- page_sidebar(
         checkboxInput(
           inputId = "var.equal",
           label = "Je stejný rozptyl?"
-        ),
-        checkboxInput(
-          inputId = "correct",
-          label = "Oprava na spojitost?"
         )
       ),
       accordion_panel(
@@ -104,7 +100,7 @@ ui <- page_sidebar(
               placement = "right"
             ),
             min = 1, max = 10000, step = 1,
-            value = 1000
+            value = 100
           ),
           numericInput(
             inputId = "B",
