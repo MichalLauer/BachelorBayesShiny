@@ -133,6 +133,6 @@ ui <- page_sidebar(
     nav_panel("Populace", populationUI("population")),
     nav_panel("Parametrický test", parametricUI("parametric")),
     nav_panel("Neparametrický test", nonparametricUI("nonparametric")),
-    nav_panel("Bootstrap test", plotlyOutput("distrib_bootstrap"))
+    nav_panel("Bootstrap test", bootstrapUI("bootstrap"))
   )
 )

@@ -30,50 +30,7 @@ server <- function(input, output, session) {
   populationServer("population", control = input)
   parametricServer("parametric", control = input)
   nonparametricServer("nonparametric", control = input)
-
-
-
-
-
-
-
-
-
-  output$distrib_nonparametric <-
-
-  output$distrib_bootstrap <- renderPlotly({
-    sam <- sampleData()
-    if (is.null(sam$x2)) {
-      sample <- sam$x1
-    } else {
-      sample <- sam$x1 - sam$x2
-    }
-
-    means <- sapply(
-      X = seq_len(input$B),
-      FUN = \(i) {
-        set.seed(input$seed + i)
-        mean(sample(x = sample, size = length(sample), replace = TRUE))
-      }
-    )
-
-    plot <-
-      plot_ly(type = 'histogram') |>
-      add_trace(x = ~means) |>
-      layout(
-        title = "Neparametrický bootstrap",
-        xaxis = list(
-          title = "",
-          showgrid = FALSE,
-          zeroline = FALSE
-        ),
-        showlegend = FALSE
-      )
-
-
-    plot
-  }) |>
-    bindEvent(sampleData())
+  bootstrapServer("bootstrap", control = input)
 
 }
 
