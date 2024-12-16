@@ -24,15 +24,15 @@ parametricServer <- function(id, control) {
       dH0 <- StudentT$new(df = unname(test$parameter))
       test.stat <- test$statistic
       p.test.stat <- dH0$pdf(test.stat)
-      test.stat <- abs(test$statistic)
+      abs.test.stat <- abs(test$statistic)
       # Pravá strana H0
-      xH0r <- seq(from = test.stat,
-                  to = max(test.stat, dH0$quantile(1 - (1/1000))),
+      xH0r <- seq(from = abs.test.stat,
+                  to = max(abs.test.stat, dH0$quantile(1 - (1/1000))),
                   by = 0.01)
       yH0r <- dH0$pdf(xH0r)
       # Levá strana HO
-      xH0l <- seq(from = -test.stat,
-                  to = min(-test.stat, dH0$quantile(1/1000)),
+      xH0l <- seq(from = -abs.test.stat,
+                  to = min(-abs.test.stat, dH0$quantile(1/1000)),
                   by = -0.01)
       yH0l <- dH0$pdf(xH0l)
       # Data pro H0
