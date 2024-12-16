@@ -8,6 +8,7 @@ ui <- page_sidebar(
         textInput(
           inputId = "distr1",
           label = "Rozdělení 1. populace",
+          value = "N(0, 1)",
           placeholder = "N(0, 1)"
         ),
         textInput(
@@ -61,7 +62,7 @@ ui <- page_sidebar(
   ),
   navset_card_underline(
     title = "Zobrazené rozdělení",
-    nav_panel("Populace", plotlyOutput("distrib_population")),
+    nav_panel("Populace", populationUI("population")),
     nav_panel("Parametrický test",
               layout_columns(
                 plotlyOutput("distrib_parametric")

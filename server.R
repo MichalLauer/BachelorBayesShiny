@@ -1,8 +1,9 @@
 server <- function(input, output, session) {
 
   # Uložení uživatelských rozdělení
-  population <- reactiveVal()
-  sampleData <- reactiveVal()
+  sud <- session$userData
+  sud$population <- reactiveVal()
+  sud$sampleData <- reactiveVal()
   observe({
     # Kontrola vstupu
     # TODO...
@@ -19,51 +20,14 @@ server <- function(input, output, session) {
       pop$x2 <- NULL
     }
 
-    population(pop)
-    sampleData(sam)
+    sud$population(pop)
+    sud$sampleData(sam)
   }) |>
     bindEvent(input$go)
 
+  populationServer("population")
 
-  output$distrib_population <- renderPlotly({
-    pop <- population()
 
-    xy <- get_xy(pop$x1)
-    plot <-
-      plot_ly(type = 'scatter', mode = 'lines', fill = 'tozeroy') |>
-      add_trace(x = ~xy$x, y = ~xy$y, name = xy$n) |>
-      layout(
-        xaxis = list(
-          title = "",
-          showgrid = FALSE,
-          zeroline = FALSE
-        ),
-        yaxis = list(
-          title = paste("Hustota pro", xy$n)
-        ),
-        legend = list(
-          orientation = "h"
-        )
-      )
-
-    if (!is.null(pop$x2)) {
-      xy2 <- get_xy(pop$x2)
-      plot <-
-        plot |>
-        add_trace(x = ~xy2$x, y = ~xy2$y, name = xy2$n, yaxis = "y2") |>
-        layout(
-          yaxis2 = list(
-            side = "right",
-            overlaying = "y",
-            automargin = TRUE,
-            title = paste("Hustota pro", xy2$n)
-          )
-        )
-    }
-
-    plot
-  }) |>
-    bindEvent(population())
 
   output$distrib_parametric <- renderPlotly({
     sam <- sampleData()
@@ -153,7 +117,7 @@ server <- function(input, output, session) {
       }
     ) |> mean()
 
-    glue::glue(
+    glue(
       "Chyba I. typu: {errorI}\n",
       "Chyba II. typu: {errorII}\n",
       "Síla testu: typu: {1 - errorII}\n",
