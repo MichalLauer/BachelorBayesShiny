@@ -1,4 +1,4 @@
-parametricUI <- function(id) {
+nonparametricUI <- function(id) {
   ns <- NS(id)
 
   tagList(
@@ -13,18 +13,25 @@ parametricUI <- function(id) {
   )
 }
 
-parametricServer <- function(id, control) {
+nonparametricServer <- function(id, control) {
   moduleServer(id, function(input, output, session) {
     sud <- session$userData
 
-    output$distribution <- renderPlotly({
+    output$distribution <-  renderPlotly({
       sam <- sud$sampleData()
-      # t-test
-      test <- t.test(sam$x1, sam$x2, mu = control$H0)
-      dH0 <- StudentT$new(df = unname(test$parameter))
-      test.stat <- test$statistic
+      test <- wilcox.test(sam$x1, sam$x2, mu = control$H0, correct = FALSE)
+      if (is.null(sam$x2)) {
+        mu <- control$n*(control$n + 1)/4
+        s2 <- control$n*(control$n + 1)*(2*control$n + 1)/24
+      } else {
+        mu <- control$n*(2*control$n + 1)/2
+        s2 <- control$n*control$n*(2*control$n + 1)/12
+      }
+      test.stat <- (test$statistic - mu) / sqrt(s2)
+
+      dH0 <- Normal$new()
       p.test.stat <- dH0$pdf(test.stat)
-      test.stat <- abs(test$statistic)
+      test.stat <- abs(test.stat)
       # Pravá strana H0
       xH0r <- seq(from = test.stat,
                   to = max(test.stat, dH0$quantile(1 - (1/1000))),
@@ -56,16 +63,25 @@ parametricServer <- function(id, control) {
           showlegend = FALSE
         )
 
+      plot
     }) |>
       bindEvent(control$go)
 
     output$hypothesis <- renderPrint({
       sam <- sud$sampleData()
-      test <- t.test(sam$x1, sam$x2, mu = control$H0)
+      test <- wilcox.test(sam$x1, sam$x2, mu = control$H0, correct = FALSE)
+      if (is.null(sam$x2)) {
+        mu <- control$n*(control$n + 1)/4
+        s2 <- control$n*(control$n + 1)*(2*control$n + 1)/24
+      } else {
+        mu <- control$n*(2*control$n + 1)/2
+        s2 <- control$n*control$n*(2*control$n + 1)/12
+      }
+      test.stat <- (test$statistic - mu) / sqrt(s2)
 
       glue(
         "H0: mu = {control$H0}\n",
-        "T: {test$statistic}\n",
+        "T: {test$statistic} (z: {test.stat})\n",
         "p-val.: {test$p.value}\n"
       )
     }) |>
@@ -86,7 +102,9 @@ parametricServer <- function(id, control) {
             mu <- mu - pop$x2$mean()
           }
 
-          t.test(s1, s2, mu = mu)$p.value <= control$alpha
+          wilcox.test(s1, s2,
+                      mu = control$H0,
+                      correct = FALSE)$p.value <= control$alpha
         }
       ) |> mean()
 
@@ -100,7 +118,9 @@ parametricServer <- function(id, control) {
             s2 <- pop$x2$rand(control$n)
           }
 
-          t.test(s1, s2, mu = control$H1)$p.value >= control$alpha
+          wilcox.test(s1, s2,
+                      mu = control$H1,
+                      correct = FALSE)$p.value >= control$alpha
         }
       ) |> mean()
 
