@@ -20,6 +20,18 @@ ui <- page_sidebar(
           inputId = "distr2",
           label = "Rozdělení 2. populace",
           placeholder = "LN(5, 10)"
+        ),
+        checkboxInput(
+          inputId = "paired",
+          label = "Jsou data závislá?"
+        ),
+        checkboxInput(
+          inputId = "var.equal",
+          label = "Je stejný rozptyl?"
+        ),
+        checkboxInput(
+          inputId = "correct",
+          label = "Oprava na spojitost?"
         )
       ),
       accordion_panel(

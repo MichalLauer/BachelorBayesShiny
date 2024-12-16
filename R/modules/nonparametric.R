@@ -17,9 +17,16 @@ nonparametricServer <- function(id, control) {
   moduleServer(id, function(input, output, session) {
     sud <- session$userData
 
+    conduct_wilcox_test <- function(x, y, c, use_h0 = TRUE) {
+      wilcox.test(x = x, y = y,
+                  mu = if (use_h0) c$H0 else c$H1,
+                  paired = c$paired,
+                  correct = c$correct)
+    }
+
     output$distribution <-  renderPlotly({
       sam <- sud$sampleData()
-      test <- wilcox.test(sam$x1, sam$x2, mu = control$H0, correct = FALSE)
+      test <- conduct_wilcox_test(sam$x1, sam$x2, control)
       if (is.null(sam$x2)) {
         mu <- control$n*(control$n + 1)/4
         s2 <- control$n*(control$n + 1)*(2*control$n + 1)/24
@@ -69,7 +76,7 @@ nonparametricServer <- function(id, control) {
 
     output$hypothesis <- renderPrint({
       sam <- sud$sampleData()
-      test <- wilcox.test(sam$x1, sam$x2, mu = control$H0, correct = FALSE)
+      test <- conduct_wilcox_test(sam$x1, sam$x2, control)
       if (is.null(sam$x2)) {
         mu <- control$n*(control$n + 1)/4
         s2 <- control$n*(control$n + 1)*(2*control$n + 1)/24
@@ -102,9 +109,7 @@ nonparametricServer <- function(id, control) {
             mu <- mu - pop$x2$mean()
           }
 
-          wilcox.test(s1, s2,
-                      mu = control$H0,
-                      correct = FALSE)$p.value <= control$alpha
+          conduct_wilcox_test(s1, s2, control)$p.value <= control$alpha
         }
       ) |> mean()
 
@@ -118,9 +123,7 @@ nonparametricServer <- function(id, control) {
             s2 <- pop$x2$rand(control$n)
           }
 
-          wilcox.test(s1, s2,
-                      mu = control$H1,
-                      correct = FALSE)$p.value >= control$alpha
+          conduct_wilcox_test(s1, s2, control)$p.value >= control$alpha
         }
       ) |> mean()
 
