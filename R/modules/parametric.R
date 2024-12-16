@@ -20,7 +20,7 @@ parametricServer <- function(id, control) {
     output$distribution <- renderPlotly({
       sam <- sud$sampleData()
       # t-test
-      test <- t.test(sam$x1, sam$x2, mu = control$H0)
+      test <- conduct_t_test(sam$x1, sam$x2, control)
       dH0 <- StudentT$new(df = unname(test$parameter))
       test.stat <- test$statistic
       p.test.stat <- dH0$pdf(test.stat)
@@ -61,7 +61,7 @@ parametricServer <- function(id, control) {
 
     output$hypothesis <- renderPrint({
       sam <- sud$sampleData()
-      test <- t.test(sam$x1, sam$x2, mu = control$H0)
+      test <- conduct_t_test(sam$x1, sam$x2, control)
 
       glue(
         "H0: mu = {control$H0}\n",
@@ -86,7 +86,7 @@ parametricServer <- function(id, control) {
             mu <- mu - pop$x2$mean()
           }
 
-          t.test(s1, s2, mu = mu)$p.value <= control$alpha
+          conduct_t_test(s1, s2, control)$p.value <= control$alpha
         }
       ) |> mean()
 
@@ -100,7 +100,7 @@ parametricServer <- function(id, control) {
             s2 <- pop$x2$rand(control$n)
           }
 
-          t.test(s1, s2, mu = control$H1)$p.value >= control$alpha
+          conduct_t_test(s1, s2, control, use_h0 = FALSE)$p.value >= control$alpha
         }
       ) |> mean()
 
