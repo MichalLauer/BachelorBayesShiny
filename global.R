@@ -8,9 +8,6 @@ library(tidyr)
 library(glue)
 
 invisible(lapply(
-  X = list.files(path = "R", full.names = TRUE), FUN = source
-))
-
-invisible(lapply(
-  X = list.files(path = "modules", full.names = TRUE), FUN = source
+  X = list.files(path = "R", full.names = TRUE, recursive = TRUE),
+  FUN = source
 ))

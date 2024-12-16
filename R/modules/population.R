@@ -13,7 +13,7 @@ populationUI <- function(id) {
   )
 }
 
-populationServer <- function(id) {
+populationServer <- function(id, control) {
   moduleServer(id, function(input, output, session) {
     sud <- session$userData
 
@@ -57,9 +57,9 @@ populationServer <- function(id) {
 
       plot
     }) |>
-      bindEvent(sud$population())
+      bindEvent(control$go)
 
-    output$distrib1 <- renderText({
+    output$distrib1 <- renderPrint({
       d <- sud$population()$x1
       glue("
             První rozdělení: {d$strprint()}
@@ -67,9 +67,9 @@ populationServer <- function(id) {
             D(X): {d$variance()}
            ")
     }) |>
-      bindEvent(sud$population())
+      bindEvent(control$go)
 
-    output$distrib2 <- renderText({
+    output$distrib2 <- renderPrint({
       d <- sud$population()$x2
       if (is.null(d)) {
         return("Druhé rozdělení: <nedefinováno>")
@@ -81,6 +81,6 @@ populationServer <- function(id) {
             D(X): {d$variance()}
            ")
     }) |>
-      bindEvent(sud$population())
+      bindEvent(control$go)
   })
 }

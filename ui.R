@@ -63,15 +63,7 @@ ui <- page_sidebar(
   navset_card_underline(
     title = "Zobrazené rozdělení",
     nav_panel("Populace", populationUI("population")),
-    nav_panel("Parametrický test",
-              layout_columns(
-                plotlyOutput("distrib_parametric")
-              ),
-              layout_columns(
-                verbatimTextOutput("distrib_parametric_test"),
-                verbatimTextOutput("distrib_parametric_stats")
-              )
-    ),
+    nav_panel("Parametrický test", parametricUI("parametric")),
     nav_panel("Neparametrický test", plotlyOutput("distrib_nonparametric")),
     nav_panel("Bootstrap test", plotlyOutput("distrib_bootstrap"))
   )
