@@ -1,5 +1,7 @@
+# Shiny
 library(shiny)
 library(bslib)
+# Data wrangling
 library(plotly)
 library(distr6)
 library(purrr)
