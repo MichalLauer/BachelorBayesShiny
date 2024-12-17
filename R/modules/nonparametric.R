@@ -161,7 +161,7 @@ nonparametricServer <- function(id, control) {
       glue(
         "Chyba I. typu: {errorI}\n",
         "Chyba II. typu: {errorII}\n",
-        "Síla testu: typu: {1 - errorII}\n",
+        "Síla testu: {1 - errorII}\n",
       )
     }) |>
       bindEvent(control$go)

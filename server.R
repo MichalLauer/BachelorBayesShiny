@@ -31,5 +31,4 @@ server <- function(input, output, session) {
   parametricServer("parametric", control = input)
   nonparametricServer("nonparametric", control = input)
   bootstrapServer("bootstrap", control = input)
-
 }

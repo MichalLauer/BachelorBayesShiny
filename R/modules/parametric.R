@@ -90,11 +90,9 @@ parametricServer <- function(id, control) {
         FUN = \(i) {
           set.seed(control$seed + i)
           s1 <- pop$x1$rand(control$n)
-          mu <- pop$x1$mean()
           s2 <- NULL
           if (!is.null(pop$x2)) {
             s2 <- pop$x2$rand(control$n)
-            mu <- mu - pop$x2$mean()
           }
 
           conduct_t_test(s1, s2, control)$p.value <= control$alpha
@@ -118,7 +116,7 @@ parametricServer <- function(id, control) {
       glue(
         "Chyba I. typu: {errorI}\n",
         "Chyba II. typu: {errorII}\n",
-        "Síla testu: typu: {1 - errorII}\n",
+        "Síla testu: {1 - errorII}\n",
       )
     }) |>
       bindEvent(control$go)
