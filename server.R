@@ -33,5 +33,3 @@ server <- function(input, output, session) {
   bootstrapServer("bootstrap", control = input)
 
 }
-
-

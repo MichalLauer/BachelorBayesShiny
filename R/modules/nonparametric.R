@@ -22,13 +22,26 @@ nonparametricServer <- function(id, control) {
       test <- conduct_wilcox_test(sam$x1, sam$x2, control)
 
       if (is.null(sam$x2)) {
+        W <- test$statistic
         mu <- control$n*(control$n + 1)/4
         s2 <- control$n*(control$n + 1)*(2*control$n + 1)/24
       } else {
-        mu <- control$n*(2*control$n + 1)/2
-        s2 <- control$n*control$n*(2*control$n + 1)/12
+        if (control$paired) {
+          d <- sam$x1 - sam$x2
+          d_nonzero <- d[d != 0]
+          n <- length(d_nonzero)
+          ranks <- rank(abs(d_nonzero))
+          signed_ranks <- ranks * sign(d_nonzero)
+          W <- sum(signed_ranks[signed_ranks > 0])
+          mu <- control$n * (control$n + 1) / 4
+          s2 <- control$n * (control$n + 1) * (2 * control$n + 1) / 24
+        } else {
+          W <- test$statistic + control$n * (control$n + 1) / 2
+          mu <- control$n*(2*control$n + 1)/2
+          s2 <- control$n*control$n*(2*control$n + 1)/12
+        }
       }
-      test.stat <- (test$statistic - mu) / sqrt(s2)
+      test.stat <- (W - mu) / sqrt(s2)
 
       dH0 <- Normal$new()
       p.test.stat <- dH0$pdf(test.stat)
@@ -47,10 +60,21 @@ nonparametricServer <- function(id, control) {
       xy <- get_xy(d = dH0)
       plot <-
         plot_ly(type = 'scatter', mode = 'lines') |>
-        add_trace(x = ~xy$x, y = ~xy$y, name = xy$n) |>
-        add_trace(x = ~test.stat, y = ~p.test.stat, mode = "marker") |>
-        add_trace(x = ~xH0r, y = ~yH0r, fill = "tozeroy") |>
-        add_trace(x = ~xH0l, y = ~yH0l, fill = "tozeroy") |>
+        add_trace(x = ~xy$x, y = ~xy$y, name = xy$n,
+                  hoverinfo = 'text',
+                  text = ~ glue("{xy$n}<br>",
+                                "f({xy$x}) = {xy$y}")) |>
+        add_trace(x = ~test.stat, y = ~p.test.stat, mode = "marker",
+                  hoverinfo = 'text',
+                  text = ~ glue("T={test.stat}")) |>
+        add_trace(x = ~xH0r, y = ~yH0r, fill = "tozeroy", fillcolor = '#ff4e4e',
+                  hoverinfo = 'text',
+                  hoveron = 'fills',
+                  text = ~ glue("p-value: {test$p.value}")) |>
+        add_trace(x = ~xH0l, y = ~yH0l, fill = "tozeroy", fillcolor = '#ff4e4e',
+                  hoverinfo = 'text',
+                  hoveron = 'fills',
+                  text = ~ glue("p-value: {test$p.value}")) |>
         layout(
           title = test$method,
           xaxis = list(
@@ -72,17 +96,30 @@ nonparametricServer <- function(id, control) {
       sam <- sud$sampleData()
       test <- conduct_wilcox_test(sam$x1, sam$x2, control)
       if (is.null(sam$x2)) {
+        W <- test$statistic
         mu <- control$n*(control$n + 1)/4
         s2 <- control$n*(control$n + 1)*(2*control$n + 1)/24
       } else {
-        mu <- control$n*(2*control$n + 1)/2
-        s2 <- control$n*control$n*(2*control$n + 1)/12
+        if (control$paired) {
+          d <- sam$x1 - sam$x2
+          d_nonzero <- d[d != 0]
+          n <- length(d_nonzero)
+          ranks <- rank(abs(d_nonzero))
+          signed_ranks <- ranks * sign(d_nonzero)
+          W <- sum(signed_ranks[signed_ranks > 0])
+          mu <- control$n * (control$n + 1) / 4
+          s2 <- control$n * (control$n + 1) * (2 * control$n + 1) / 24
+        } else {
+          W <- test$statistic + control$n * (control$n + 1) / 2
+          mu <- control$n*(2*control$n + 1)/2
+          s2 <- control$n*control$n*(2*control$n + 1)/12
+        }
       }
-      test.stat <- (test$statistic - mu) / sqrt(s2)
+      test.stat <- (W - mu) / sqrt(s2)
 
       glue(
         "H0: mu = {control$H0}\n",
-        "T: {test$statistic} (z: {test.stat})\n",
+        "W: {W} (z: {test.stat})\n",
         "p-val.: {test$p.value}\n"
       )
     }) |>

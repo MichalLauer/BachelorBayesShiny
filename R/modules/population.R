@@ -23,7 +23,10 @@ populationServer <- function(id, control) {
       xy <- get_xy(pop$x1)
       plot <-
         plot_ly(type = 'scatter', mode = 'lines', fill = 'tozeroy') |>
-        add_trace(x = ~xy$x, y = ~xy$y, name = xy$n) |>
+        add_trace(x = ~xy$x, y = ~xy$y, name = xy$n,
+                  hoverinfo = 'text',
+                  text = ~ glue("{xy$n}<br>",
+                                "f({xy$x}) = {xy$y}")) |>
         layout(
           xaxis = list(
             title = "",
@@ -44,7 +47,10 @@ populationServer <- function(id, control) {
         xy2 <- get_xy(pop$x2)
         plot <-
           plot |>
-          add_trace(x = ~xy2$x, y = ~xy2$y, name = xy2$n, yaxis = "y2") |>
+          add_trace(x = ~xy2$x, y = ~xy2$y, name = xy2$n, yaxis = "y2",
+                    hoverinfo = 'text',
+                    text = ~ glue("{xy2$n}<br>",
+                                  "f({xy2$x}) = {xy2$y}")) |>
           layout(
             yaxis2 = list(
               side = "right",

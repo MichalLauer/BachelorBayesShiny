@@ -39,10 +39,21 @@ parametricServer <- function(id, control) {
       xy <- get_xy(d = dH0)
       plot <-
         plot_ly(type = 'scatter', mode = 'lines') |>
-        add_trace(x = ~xy$x, y = ~xy$y, name = xy$n) |>
-        add_trace(x = ~test.stat, y = ~p.test.stat, mode = "marker") |>
-        add_trace(x = ~xH0r, y = ~yH0r, fill = "tozeroy") |>
-        add_trace(x = ~xH0l, y = ~yH0l, fill = "tozeroy") |>
+        add_trace(x = ~xy$x, y = ~xy$y, name = xy$n,
+                  hoverinfo = 'text',
+                  text = ~ glue("{xy$n}<br>",
+                                "f({xy$x}) = {xy$y}")) |>
+        add_trace(x = ~test.stat, y = ~p.test.stat, mode = "marker",
+                  hoverinfo = 'text',
+                  text = ~ glue("T={test.stat}")) |>
+        add_trace(x = ~xH0r, y = ~yH0r, fill = "tozeroy", fillcolor = '#ff4e4e',
+                  hoverinfo = 'text',
+                  hoveron = 'fills',
+                  text = ~ glue("p-value: {test$p.value}")) |>
+        add_trace(x = ~xH0l, y = ~yH0l, fill = "tozeroy", fillcolor = '#ff4e4e',
+                  hoverinfo = 'text',
+                  hoveron = 'fills',
+                  text = ~ glue("p-value: {test$p.value}")) |>
         layout(
           title = test$method,
           xaxis = list(
