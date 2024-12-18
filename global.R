@@ -1,5 +1,6 @@
 # Shiny
 library(shiny)
+library(shinyjs)
 library(bslib)
 # Data wrangling
 library(plotly)

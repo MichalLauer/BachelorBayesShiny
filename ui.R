@@ -20,18 +20,10 @@ ui <- page_sidebar(
           inputId = "distr2",
           label = "Rozdělení 2. populace",
           placeholder = "LN(5, 10)"
-        ),
-        checkboxInput(
-          inputId = "paired",
-          label = "Jsou data závislá?"
-        ),
-        checkboxInput(
-          inputId = "var.equal",
-          label = "Je stejný rozptyl?"
         )
       ),
       accordion_panel(
-        title = "Nastavení hypotéz",
+        title = "Testování hypotéz",
         layout_columns(
           numericInput(
             inputId = "n",
@@ -60,33 +52,42 @@ ui <- page_sidebar(
             value = 0.05
           )
         ),
-        layout_columns(
-          numericInput(
-            inputId = "H0",
-            label = tooltip(
-              trigger = list(
-                withMathJax("$$H_0$$"),
-                icon("circle-question")
-              ),
-              "Nulová hypotéza, která je testována",
-              placement = "right"
+        numericInput(
+          inputId = "H0",
+          label = tooltip(
+            trigger = list(
+              withMathJax("$$H_0$$"),
+              icon("circle-question")
             ),
-            value = 0,
-            step = 1
+            "Nulová hypotéza, která je testována",
+            placement = "right"
           ),
-          numericInput(
-            inputId = "H1",
-            label = tooltip(
-              trigger = list(
-                withMathJax("$$H_1$$"),
-                icon("circle-question")
-              ),
-              "Alternativní hypotéza sloužící k výpočtu chyby II. typu",
-              placement = "right"
+          value = 0,
+          step = 0.1
+        ),
+        checkboxInput(
+          inputId = "paired",
+          label = "Jsou data závislá?"
+        ),
+        checkboxInput(
+          inputId = "var.equal",
+          label = "Je stejný rozptyl?"
+        )
+      ),
+      accordion_panel(
+        title = "Simulace",
+        numericInput(
+          inputId = "H1",
+          label = tooltip(
+            trigger = list(
+              withMathJax("$$H_1$$"),
+              icon("circle-question")
             ),
-            value = 0.5,
-            step = 1
-          )
+            "Alternativní hypotéza sloužící k výpočtu chyby II. typu",
+            placement = "right"
+          ),
+          value = 0.5,
+          step = 1
         ),
         layout_columns(
           numericInput(
@@ -116,18 +117,26 @@ ui <- page_sidebar(
             value = 1000
           )
         )
+      ),
+      accordion_panel(
+        title = "Replikovatelnost",
+        numericInput(
+          inputId = "seed",
+          label = "Seed",
+          value = runif(1)
+        ),
+        checkboxInput(
+          inputId = "use.seed",
+          label = "Použít seed?"
+        )
       )
-    ),
-    numericInput(
-      inputId = "seed",
-      label = "Seed",
-      value = runif(1)
     ),
     actionButton(
       inputId = "go",
       label = "Zapínáme pásy!"
     )
   ),
+  useShinyjs(),
   navset_card_underline(
     title = "Zobrazené rozdělení",
     nav_panel("Populace", populationUI("population")),

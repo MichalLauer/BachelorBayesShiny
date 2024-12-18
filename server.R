@@ -11,11 +11,10 @@ server <- function(input, output, session) {
     pop <- list()
     sam <- list()
     pop$x1 <- dparse(input$distr1)
-    set.seed(input$seed)
-    sam$x1 <- get_sample(d = pop$x1, n = input$n)
+    sam$x1 <- get_sample(d = pop$x1, c = input)
     if (input$distr2 != "") {
       pop$x2 <- dparse(input$distr2)
-      sam$x2 <- get_sample(d = pop$x2, n = input$n)
+      sam$x2 <- get_sample(d = pop$x2, c = input)
     } else {
       pop$x2 <- NULL
     }
@@ -26,6 +25,15 @@ server <- function(input, output, session) {
     sud$sampleData(sam)
   }) |>
     bindEvent(input$go)
+
+  observe({
+    if (input$use.seed) {
+      enable(id = "seed")
+    } else {
+      disable(id = "seed")
+    }
+  }) |>
+    bindEvent(input$use.seed)
 
   populationServer("population", control = input)
   parametricServer("parametric", control = input)

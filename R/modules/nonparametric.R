@@ -131,12 +131,11 @@ nonparametricServer <- function(id, control) {
       errorI <- sapply(
         X = seq_len(control$K),
         FUN = \(i) {
-          set.seed(control$seed + i)
-          s1 <- pop$x1$rand(control$n)
+          s1 <- get_sample(d = pop$x1, c = control, i = i)
           true_H0 <- pop$x1$mean()
           s2 <- NULL
           if (!is.null(pop$x2)) {
-            s2 <- pop$x2$rand(control$n)
+            s2 <- get_sample(d = pop$x2, c = control)
             true_H0 <- true_H0 - pop$x2$mean()
           }
 
@@ -147,11 +146,10 @@ nonparametricServer <- function(id, control) {
       errorII <- sapply(
         X = seq_len(control$K),
         FUN = \(i) {
-          set.seed(control$seed + i)
-          s1 <- pop$x1$rand(control$n)
+          s1 <- get_sample(d = pop$x1, c = control, i = i)
           s2 <- NULL
           if (!is.null(pop$x2)) {
-            s2 <- pop$x2$rand(control$n)
+            s2 <- get_sample(d = pop$x2, c = control)
           }
 
           conduct_wilcox_test(s1, s2, control, h0 = control$H1)$p.value >= control$alpha

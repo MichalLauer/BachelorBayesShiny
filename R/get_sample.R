@@ -1,9 +1,9 @@
-get_sample <- function(d, n, seed = NULL) {
-  if (!is.null(seed)) {
-    set.seed(seed)
+get_sample <- function(d, c, i = 0) {
+  if (c$use.seed) {
+    set.seed(c$seed + i)
   }
 
-  sample <- d$rand(n)
+  sample <- d$rand(c$n)
 
   return(sample)
 }
