@@ -90,12 +90,14 @@ parametricServer <- function(id, control) {
         FUN = \(i) {
           set.seed(control$seed + i)
           s1 <- pop$x1$rand(control$n)
+          true_H0 <- pop$x1$mean()
           s2 <- NULL
           if (!is.null(pop$x2)) {
             s2 <- pop$x2$rand(control$n)
+            true_H0 <- true_H0 - pop$x2$mean()
           }
 
-          conduct_t_test(s1, s2, control)$p.value <= control$alpha
+          conduct_t_test(s1, s2, control, h0 = true_H0)$p.value <= control$alpha
         }
       ) |> mean()
 
@@ -109,7 +111,7 @@ parametricServer <- function(id, control) {
             s2 <- pop$x2$rand(control$n)
           }
 
-          conduct_t_test(s1, s2, control, use_h0 = FALSE)$p.value >= control$alpha
+          conduct_t_test(s1, s2, control, h0 = control$H1)$p.value >= control$alpha
         }
       ) |> mean()
 

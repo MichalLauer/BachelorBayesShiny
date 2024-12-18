@@ -1,6 +1,6 @@
-conduct_t_test <- function(x, y, c, use_h0 = TRUE) {
+conduct_t_test <- function(x, y, c, h0 = NULL) {
   t.test(x = x, y = y,
-         mu = if (use_h0) c$H0 else c$H1,
+         mu = h0 %||% c$H0,
          paired = c$paired,
          var.equal = c$var.equal)
 }
