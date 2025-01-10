@@ -137,6 +137,7 @@ ui <- page_sidebar(
     )
   ),
   useShinyjs(),
+  useWaiter(),
   navset_card_underline(
     title = "Zobrazené rozdělení",
     nav_panel("Populace", populationUI("population")),

@@ -10,6 +10,12 @@ library(purrr)
 library(dplyr)
 library(tidyr)
 library(glue)
+# Paralel
+library(waiter)
+library(promises)
+library(future)
+plan(multisession, workers = availableCores() - 1,
+     .skip = TRUE)
 
 invisible(lapply(
   X = list.files(path = "R", full.names = TRUE, recursive = TRUE),
