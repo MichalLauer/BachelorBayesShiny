@@ -137,7 +137,10 @@ ui <- page_sidebar(
     )
   ),
   useShinyjs(),
-  useWaiter(),
+  autoWaiter(
+    id = c("parametric-stats", "nonparametric-stats", "bootstrap-stats"),
+    html = spin_dots()
+  ),
   navset_card_underline(
     title = "Zobrazené rozdělení",
     nav_panel("Populace", populationUI("population")),

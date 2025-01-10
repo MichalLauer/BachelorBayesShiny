@@ -15,7 +15,7 @@ library(waiter)
 library(promises)
 library(future)
 plan(multisession, workers = availableCores() - 1,
-     .skip = TRUE)
+     .skip = TRUE, split = TRUE)
 
 invisible(lapply(
   X = list.files(path = "R", full.names = TRUE, recursive = TRUE),

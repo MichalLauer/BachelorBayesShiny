@@ -84,11 +84,6 @@ parametricServer <- function(id, control) {
     }) |>
       bindEvent(sud$go())
 
-    # Zobrazení čekání uživateli
-    waiter <- Waiter$new(id = session$ns("stats"),
-                         html = spin_dots()
-    )
-
     # Paralelizace
     SimulationTask <- ExtendedTask$new(function(pop, control) {
       future_promise({
@@ -132,15 +127,15 @@ parametricServer <- function(id, control) {
       control_list <- reactiveValuesToList(control)
       SimulationTask$invoke(pop = sud$population,
                             control = control_list)
-      runjs(r'($("#parametric-stats").empty().prepend("\n\n\n");)')
-      waiter$show()
+      runjs(glue(
+        r'($("#{session$ns("stats")}").empty().prepend("\n\n\n");)'
+      ))
     }) |>
       bindEvent(sud$go())
 
     # Zobrazení výsledků ze simulace
     output$stats <- renderPrint({
       r <- SimulationTask$result()
-      waiter$hide()
 
       glue(
         "Chyba I. typu: {r$errorI}\n",

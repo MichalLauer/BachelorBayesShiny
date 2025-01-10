@@ -17,6 +17,7 @@ nonparametricServer <- function(id, control) {
   moduleServer(id, function(input, output, session) {
     sud <- session$userData
 
+    # Rozdělení podle h0
     output$distribution <-  renderPlotly({
       sam <- sud$sampleData
       test <- conduct_wilcox_test(sam$x1, sam$x2, control)
@@ -71,6 +72,7 @@ nonparametricServer <- function(id, control) {
     }) |>
       bindEvent(sud$go())
 
+    # Charakteristika h0
     output$hypothesis <- renderPrint({
       sam <- sud$sampleData
       test <- conduct_wilcox_test(sam$x1, sam$x2, control)
@@ -84,43 +86,63 @@ nonparametricServer <- function(id, control) {
     }) |>
       bindEvent(sud$go())
 
-    output$stats <- renderPrint({
-      pop <- sud$population
+    # Paralelizace
+    SimulationTask <- ExtendedTask$new(function(pop, control) {
+      future_promise({
+        errorI <- sapply(
+          X = seq_len(control$K),
+          FUN = \(i) {
+            s1 <- get_sample(d = pop$x1, c = control, i = i)
+            true_H0 <- pop$x1$mean()
+            s2 <- NULL
+            if (!is.null(pop$x2)) {
+              s2 <- get_sample(d = pop$x2, c = control)
+              true_H0 <- true_H0 - pop$x2$mean()
+            }
 
-      errorI <- sapply(
-        X = seq_len(control$K),
-        FUN = \(i) {
-          s1 <- get_sample(d = pop$x1, c = control, i = i)
-          true_H0 <- pop$x1$mean()
-          s2 <- NULL
-          if (!is.null(pop$x2)) {
-            s2 <- get_sample(d = pop$x2, c = control)
-            true_H0 <- true_H0 - pop$x2$mean()
+            conduct_wilcox_test(s1, s2, control, h0 = true_H0)$p.value <= control$alpha
           }
+        ) |> mean()
 
-          conduct_wilcox_test(s1, s2, control, h0 = true_H0)$p.value <= control$alpha
-        }
-      ) |> mean()
+        errorII <- sapply(
+          X = seq_len(control$K),
+          FUN = \(i) {
+            s1 <- get_sample(d = pop$x1, c = control, i = i)
+            s2 <- NULL
+            if (!is.null(pop$x2)) {
+              s2 <- get_sample(d = pop$x2, c = control)
+            }
 
-      errorII <- sapply(
-        X = seq_len(control$K),
-        FUN = \(i) {
-          s1 <- get_sample(d = pop$x1, c = control, i = i)
-          s2 <- NULL
-          if (!is.null(pop$x2)) {
-            s2 <- get_sample(d = pop$x2, c = control)
+            conduct_wilcox_test(s1, s2, control, h0 = control$H1)$p.value >= control$alpha
           }
+        ) |> mean()
 
-          conduct_wilcox_test(s1, s2, control, h0 = control$H1)$p.value >= control$alpha
-        }
-      ) |> mean()
+        list(
+          errorI = errorI,
+          errorII = errorII
+        )
+      }, seed = TRUE)
+    })
 
-      glue(
-        "Chyba I. typu: {errorI}\n",
-        "Chyba II. typu: {errorII}\n",
-        "Síla testu: {1 - errorII}\n",
-      )
+    # Zahájení simulace
+    observe({
+      control_list <- reactiveValuesToList(control)
+      SimulationTask$invoke(pop = sud$population,
+                            control = control_list)
+      runjs(glue(
+        r'($("#{session$ns("stats")}").empty().prepend("\n\n\n");)'
+      ))
     }) |>
       bindEvent(sud$go())
+
+    output$stats <- renderPrint({
+      r <- SimulationTask$result()
+
+      glue(
+        "Chyba I. typu: {r$errorI}\n",
+        "Chyba II. typu: {r$errorII}\n",
+        "Síla testu: {1 - r$errorII}\n",
+      )
+    })
   })
 }
