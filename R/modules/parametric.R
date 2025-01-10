@@ -84,7 +84,7 @@ parametricServer <- function(id, control) {
 
     output$stats <- renderPrint({
       pop <- sud$population
-      # t-test
+
       errorI <- sapply(
         X = seq_len(control$K),
         FUN = \(i) {

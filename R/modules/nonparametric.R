@@ -20,28 +20,7 @@ nonparametricServer <- function(id, control) {
     output$distribution <-  renderPlotly({
       sam <- sud$sampleData
       test <- conduct_wilcox_test(sam$x1, sam$x2, control)
-
-      if (is.null(sam$x2)) {
-        W <- test$statistic
-        mu <- control$n*(control$n + 1)/4
-        s2 <- control$n*(control$n + 1)*(2*control$n + 1)/24
-      } else {
-        if (control$paired) {
-          d <- sam$x1 - sam$x2
-          d_nonzero <- d[d != 0]
-          n <- length(d_nonzero)
-          ranks <- rank(abs(d_nonzero))
-          signed_ranks <- ranks * sign(d_nonzero)
-          W <- sum(signed_ranks[signed_ranks > 0])
-          mu <- control$n * (control$n + 1) / 4
-          s2 <- control$n * (control$n + 1) * (2 * control$n + 1) / 24
-        } else {
-          W <- test$statistic + control$n * (control$n + 1) / 2
-          mu <- control$n*(2*control$n + 1)/2
-          s2 <- control$n*control$n*(2*control$n + 1)/12
-        }
-      }
-      test.stat <- (W - mu) / sqrt(s2)
+      test.stat <- wilcox_test_stat(test, c = control, s = sam)
 
       dH0 <- Normal$new()
       p.test.stat <- dH0$pdf(test.stat)
@@ -95,31 +74,11 @@ nonparametricServer <- function(id, control) {
     output$hypothesis <- renderPrint({
       sam <- sud$sampleData
       test <- conduct_wilcox_test(sam$x1, sam$x2, control)
-      if (is.null(sam$x2)) {
-        W <- test$statistic
-        mu <- control$n*(control$n + 1)/4
-        s2 <- control$n*(control$n + 1)*(2*control$n + 1)/24
-      } else {
-        if (control$paired) {
-          d <- sam$x1 - sam$x2
-          d_nonzero <- d[d != 0]
-          n <- length(d_nonzero)
-          ranks <- rank(abs(d_nonzero))
-          signed_ranks <- ranks * sign(d_nonzero)
-          W <- sum(signed_ranks[signed_ranks > 0])
-          mu <- control$n * (control$n + 1) / 4
-          s2 <- control$n * (control$n + 1) * (2 * control$n + 1) / 24
-        } else {
-          W <- test$statistic + control$n * (control$n + 1) / 2
-          mu <- control$n*(2*control$n + 1)/2
-          s2 <- control$n*control$n*(2*control$n + 1)/12
-        }
-      }
-      test.stat <- (W - mu) / sqrt(s2)
+      test.stat <- wilcox_test_stat(test, c = control, s = sam)
 
       glue(
         "H0: mu = {control$H0}\n",
-        "W: {W} (z: {test.stat})\n",
+        "W: {test.stat}\n",
         "p-val.: {test$p.value}\n"
       )
     }) |>
@@ -127,7 +86,7 @@ nonparametricServer <- function(id, control) {
 
     output$stats <- renderPrint({
       pop <- sud$population
-      # t-test
+
       errorI <- sapply(
         X = seq_len(control$K),
         FUN = \(i) {

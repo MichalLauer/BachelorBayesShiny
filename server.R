@@ -46,6 +46,7 @@ server <- function(input, output, session) {
   }) |>
     bindEvent(input$go)
 
+  # Vypnutí/zapnutí seed vstupu
   observe({
     if (input$use.seed) {
       enable(id = "seed")
@@ -55,11 +56,7 @@ server <- function(input, output, session) {
   }) |>
     bindEvent(input$use.seed)
 
-  observe({
-
-  }) |>
-    bindEvent(sud$go())
-
+  # Moduly
   populationServer("population", control = input)
   parametricServer("parametric", control = input)
   nonparametricServer("nonparametric", control = input)
