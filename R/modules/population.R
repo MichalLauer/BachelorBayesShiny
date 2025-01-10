@@ -18,7 +18,7 @@ populationServer <- function(id, control) {
     sud <- session$userData
 
     output$distribution <- renderPlotly({
-      pop <- sud$population()
+      pop <- sud$population
 
       xy <- get_xy(pop$x1)
       plot <-
@@ -63,20 +63,20 @@ populationServer <- function(id, control) {
 
       plot
     }) |>
-      bindEvent(control$go)
+      bindEvent(sud$go())
 
     output$distrib1 <- renderPrint({
-      d <- sud$population()$x1
+      d <- sud$population$x1
       glue("
             První rozdělení: {d$strprint()}
             E(X): {d$mean()}
             D(X): {d$variance()}
            ")
     }) |>
-      bindEvent(control$go)
+      bindEvent(sud$go())
 
     output$distrib2 <- renderPrint({
-      d <- sud$population()$x2
+      d <- sud$population$x2
       if (is.null(d)) {
         return("Druhé rozdělení: <nedefinováno>")
       }
@@ -87,6 +87,6 @@ populationServer <- function(id, control) {
             D(X): {d$variance()}
            ")
     }) |>
-      bindEvent(control$go)
+      bindEvent(sud$go())
   })
 }

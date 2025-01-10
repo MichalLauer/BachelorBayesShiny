@@ -18,7 +18,7 @@ nonparametricServer <- function(id, control) {
     sud <- session$userData
 
     output$distribution <-  renderPlotly({
-      sam <- sud$sampleData()
+      sam <- sud$sampleData
       test <- conduct_wilcox_test(sam$x1, sam$x2, control)
 
       if (is.null(sam$x2)) {
@@ -90,10 +90,10 @@ nonparametricServer <- function(id, control) {
 
       plot
     }) |>
-      bindEvent(control$go)
+      bindEvent(sud$go())
 
     output$hypothesis <- renderPrint({
-      sam <- sud$sampleData()
+      sam <- sud$sampleData
       test <- conduct_wilcox_test(sam$x1, sam$x2, control)
       if (is.null(sam$x2)) {
         W <- test$statistic
@@ -123,10 +123,10 @@ nonparametricServer <- function(id, control) {
         "p-val.: {test$p.value}\n"
       )
     }) |>
-      bindEvent(control$go)
+      bindEvent(sud$go())
 
     output$stats <- renderPrint({
-      pop <- sud$population()
+      pop <- sud$population
       # t-test
       errorI <- sapply(
         X = seq_len(control$K),
@@ -162,6 +162,6 @@ nonparametricServer <- function(id, control) {
         "Síla testu: {1 - errorII}\n",
       )
     }) |>
-      bindEvent(control$go)
+      bindEvent(sud$go())
   })
 }

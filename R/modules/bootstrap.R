@@ -20,7 +20,7 @@ bootstrapServer <- function(id, control) {
     bootstrapped <- reactiveVal()
 
     output$distribution <- renderPlotly({
-      sam <- sud$sampleData()
+      sam <- sud$sampleData
       if (is.null(sam$x2)) {
         sample <- sam$x1
       } else {
@@ -57,7 +57,7 @@ bootstrapServer <- function(id, control) {
 
       plot
     }) |>
-      bindEvent(control$go)
+      bindEvent(sud$go())
 
     output$hypothesis <- renderPrint({
       boot <- bootstrapped()
@@ -68,10 +68,10 @@ bootstrapServer <- function(id, control) {
         "p-val.: {boot$p.value}\n"
       )
     }) |>
-      bindEvent(control$go)
+      bindEvent(sud$go())
 
     output$stats <- renderPrint({
-      pop <- sud$population()
+      pop <- sud$population
 
       errorI <- sapply(
         X = seq_len(control$K),
@@ -134,6 +134,6 @@ bootstrapServer <- function(id, control) {
         "Síla testu: {1 - errorII}\n",
       )
     }) |>
-      bindEvent(control$go)
+      bindEvent(sud$go())
   })
 }

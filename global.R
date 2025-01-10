@@ -1,6 +1,7 @@
 # Shiny
 library(shiny)
 library(shinyjs)
+library(shinyvalidate)
 library(bslib)
 # Data wrangling
 library(plotly)

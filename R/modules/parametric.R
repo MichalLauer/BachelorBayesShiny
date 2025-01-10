@@ -18,7 +18,7 @@ parametricServer <- function(id, control) {
     sud <- session$userData
 
     output$distribution <- renderPlotly({
-      sam <- sud$sampleData()
+      sam <- sud$sampleData
       # t-test
       test <- conduct_t_test(sam$x1, sam$x2, control)
       dH0 <- StudentT$new(df = unname(test$parameter))
@@ -68,10 +68,10 @@ parametricServer <- function(id, control) {
         )
 
     }) |>
-      bindEvent(control$go)
+      bindEvent(sud$go())
 
     output$hypothesis <- renderPrint({
-      sam <- sud$sampleData()
+      sam <- sud$sampleData
       test <- conduct_t_test(sam$x1, sam$x2, control)
 
       glue(
@@ -80,10 +80,10 @@ parametricServer <- function(id, control) {
         "p-val.: {test$p.value}\n"
       )
     }) |>
-      bindEvent(control$go)
+      bindEvent(sud$go())
 
     output$stats <- renderPrint({
-      pop <- sud$population()
+      pop <- sud$population
       # t-test
       errorI <- sapply(
         X = seq_len(control$K),
@@ -119,6 +119,6 @@ parametricServer <- function(id, control) {
         "Síla testu: {1 - errorII}\n",
       )
     }) |>
-      bindEvent(control$go)
+      bindEvent(sud$go())
   })
 }

@@ -1,12 +1,33 @@
 server <- function(input, output, session) {
 
+  # Definice pravidel pro vstupní data
+  iv <- InputValidator$new()
+  iv$add_rule("distr1", is_distr)
+  iv$add_rule("distr2", is_distr)
+  iv$add_rule("n", sv_required("n je povinné."))
+  iv$add_rule("n", sv_gte(2, "n musí být >= {rhs}."))
+  iv$add_rule("n", sv_integer("n musí být celé číslo."))
+  iv$add_rule("alpha", sv_required("alpha je povinná."))
+  iv$add_rule("alpha", sv_between(0, 1, message_fmt = "alpha musí být v <{left}, {right})."))
+  iv$add_rule("alpha", sv_between(0, 1, message_fmt = "alpha musí být v <{left}, {right})."))
+  iv$add_rule("H0", sv_required("H0 je povinná."))
+  iv$add_rule("H1", sv_required("H1 je povinná."))
+  iv$add_rule("K", sv_required("K je povinné."))
+  iv$add_rule("K", sv_gte(1, "K musí být >= {rhs}."))
+  iv$add_rule("K", sv_integer("K musí být celé číslo."))
+  iv$add_rule("B", sv_required("B je povinné."))
+  iv$add_rule("B", sv_gte(1, "B musí být >= {rhs}."))
+  iv$add_rule("B", sv_integer("B musí být celé číslo."))
+  iv$add_rule("seed", \(x) if (input$use.seed & !is.numeric(x)) "Je nutné zadat číslo.")
+  iv$enable()
+
   # Uložení uživatelských rozdělení
   sud <- session$userData
-  sud$population <- reactiveVal()
-  sud$sampleData <- reactiveVal()
+  sud$population <- list()
+  sud$sampleData <- list()
+  sud$go <- reactiveVal(NULL)
   observe({
-    # Kontrola vstupu
-    # TODO...
+    req(iv$is_valid())
 
     pop <- list()
     sam <- list()
@@ -19,10 +40,9 @@ server <- function(input, output, session) {
       pop$x2 <- NULL
     }
 
-    sud$population(NULL)
-    sud$population(pop)
-    sud$sampleData(NULL)
-    sud$sampleData(sam)
+    sud$population <- pop
+    sud$sampleData <- sam
+    sud$go(runif(1))
   }) |>
     bindEvent(input$go)
 
@@ -34,6 +54,11 @@ server <- function(input, output, session) {
     }
   }) |>
     bindEvent(input$use.seed)
+
+  observe({
+
+  }) |>
+    bindEvent(sud$go())
 
   populationServer("population", control = input)
   parametricServer("parametric", control = input)
