@@ -135,6 +135,7 @@ nonparametricServer <- function(id, control) {
     }) |>
       bindEvent(sud$go())
 
+    # Zobrazení výsledků ze simulace
     output$stats <- renderPrint({
       r <- SimulationTask$result()
 

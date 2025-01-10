@@ -138,7 +138,8 @@ ui <- page_sidebar(
   ),
   useShinyjs(),
   autoWaiter(
-    id = c("parametric-stats", "nonparametric-stats", "bootstrap-stats"),
+    id = c("parametric-stats", "nonparametric-stats",
+           "bootstrap-distribution", "bootstrap-hypothesis", "bootstrap-stats"),
     html = spin_dots()
   ),
   navset_card_underline(
