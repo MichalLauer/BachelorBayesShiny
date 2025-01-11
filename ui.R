@@ -23,7 +23,7 @@ ui <- page_sidebar(
         )
       ),
       accordion_panel(
-        title = "Testování hypotéz",
+        title = "Simulace",
         layout_columns(
           numericInput(
             inputId = "n",
@@ -72,22 +72,6 @@ ui <- page_sidebar(
         checkboxInput(
           inputId = "var.equal",
           label = "Je stejný rozptyl?"
-        )
-      ),
-      accordion_panel(
-        title = "Simulace",
-        numericInput(
-          inputId = "H1",
-          label = tooltip(
-            trigger = list(
-              withMathJax("$$H_1$$"),
-              icon("circle-question")
-            ),
-            "Alternativní hypotéza sloužící k výpočtu chyby II. typu",
-            placement = "right"
-          ),
-          value = 0.5,
-          step = 1
         ),
         layout_columns(
           numericInput(

@@ -40,7 +40,7 @@ server <- function(input, output, session) {
 
     sud$population <- pop
     sud$sampleData <- sam
-    sud$go(runif(1))
+    sud$go((sud$go() %||% 0) + runif(1))
   }) |>
     bindEvent(input$go)
 

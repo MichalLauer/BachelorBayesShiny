@@ -20,11 +20,7 @@ bootstrapServer <- function(id, control) {
     # Paralelizace bootstrapu
     BootstrappedTask <- ExtendedTask$new(function(sam, control) {
       future_promise({
-        if (is.null(sam$x2)) {
-          sample <- sam$x1
-        } else {
-          sample <- sam$x1 - sam$x2
-        }
+        sample <- sam$x1 - (sam$x2 %||% 0)
 
         means <- sapply(
           X = seq_len(control$B),
@@ -37,7 +33,7 @@ bootstrapServer <- function(id, control) {
         list(
           means = means,
           observed_mean = mean(sample),
-          p.value = mean(abs(means) <= abs(mean(sample)))
+          p.value = mean(abs(means - mean(means)) >= abs(observed_mean - mean(means)))
         )
       }, seed = TRUE)
     })
@@ -49,11 +45,8 @@ bootstrapServer <- function(id, control) {
           X = seq_len(control$K),
           FUN = \(i) {
             set.seed(control$seed + i)
-            if (is.null(pop$x2)) {
-              sample <- pop$x1$rand(control$n)
-            } else {
-              sample <- pop$x1$rand(control$n) - pop$x2$rand(control$n)
-            }
+            sample <- pop$x1$rand(control$n) - (pop$x2$rand(control$n) %||% 0)
+
             # Centrování
             observed_mean <- mean(sample)
             centered_sample <- sample - observed_mean + control$H0
@@ -67,7 +60,7 @@ bootstrapServer <- function(id, control) {
               }
             )
 
-            p.value <- mean(abs(means) >= abs(observed_mean))
+            p.value <- mean(abs(means - mean(means)) >= abs(observed_mean - mean(means)))
             p.value <= control$alpha
           }
         ) |> mean()
@@ -76,11 +69,8 @@ bootstrapServer <- function(id, control) {
           X = seq_len(control$K),
           FUN = \(i) {
             set.seed(control$seed + i)
-            if (is.null(pop$x2)) {
-              sample <- pop$x1$rand(control$n)
-            } else {
-              sample <- pop$x1$rand(control$n) - pop$x2$rand(control$n)
-            }
+            sample <- pop$x1$rand(control$n) - (pop$x2$rand(control$n) %||% 0)
+
             # Centrování
             observed_mean <- mean(sample)
             centered_sample <- sample - observed_mean + control$H0
@@ -94,7 +84,7 @@ bootstrapServer <- function(id, control) {
               }
             )
 
-            p.value <- mean(abs(means) >= abs(observed_mean))
+            p.value <- mean(abs(means - mean(means)) >= abs(observed_mean - mean(means)))
             p.value > control$alpha
           }
         ) |> mean()
