@@ -36,8 +36,6 @@ server <- function(input, output, session) {
     if (input$distr2 != "") {
       pop$x2 <- dparse(input$distr2)
       sam$x2 <- get_sample(d = pop$x2, c = input)
-    } else {
-      pop$x2 <- NULL
     }
 
     sud$population <- pop
@@ -45,6 +43,16 @@ server <- function(input, output, session) {
     sud$go(runif(1))
   }) |>
     bindEvent(input$go)
+
+  # Pro první běh nastav výšku
+  observe({
+    runjs(glue(
+      r'($("#parametric-stats"}").empty().prepend("\n\n\n");)',
+      r'($("#nonparametric-stats"}").empty().prepend("\n\n\n");)',
+      r'($("#bootstrap-stats"}").empty().prepend("\n\n\n");)'
+    ))
+  }) |>
+    bindEvent(sud$go(), once = TRUE)
 
   # Vypnutí/zapnutí seed vstupu
   observe({

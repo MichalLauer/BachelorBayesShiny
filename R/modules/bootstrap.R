@@ -145,16 +145,14 @@ bootstrapServer <- function(id, control) {
       control_list <- reactiveValuesToList(control)
       SimulationTask$invoke(pop = sud$population,
                             control = control_list)
-      # TODO: Proč to nefunguje?
-      # runjs(glue(
-      #   r'($("#{session$ns("stats")}").empty().prepend("\n\n\n");)'
-      # ))
     }) |>
       bindEvent(sud$go())
 
     # Zobrazení výsledků ze simulace
     output$stats <- renderPrint({
       r <- SimulationTask$result()
+
+
       glue(
         "Chyba I. typu: {r$errorI}\n",
         "Chyba II. typu: {r$errorII}\n",

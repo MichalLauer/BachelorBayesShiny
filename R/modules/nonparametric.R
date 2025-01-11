@@ -129,9 +129,6 @@ nonparametricServer <- function(id, control) {
       control_list <- reactiveValuesToList(control)
       SimulationTask$invoke(pop = sud$population,
                             control = control_list)
-      runjs(glue(
-        r'($("#{session$ns("stats")}").empty().prepend("\n\n\n");)'
-      ))
     }) |>
       bindEvent(sud$go())
 
