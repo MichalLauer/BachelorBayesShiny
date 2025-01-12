@@ -75,9 +75,14 @@ parametricServer <- function(id, control) {
     output$hypothesis <- renderPrint({
       sam <- sud$sampleData
       test <- conduct_t_test(sam$x1, sam$x2, control)
+      if (is.null(sam$x2)) {
+        h0text <- "mu"
+      } else {
+        h0text <- "mu1 - mu2"
+      }
 
       glue(
-        "H0: mu = {control$H0}\n",
+        "H0: {h0text} = {control$H0}\n",
         "T: {test$statistic}\n",
         "p-val.: {test$p.value}\n"
       )

@@ -133,10 +133,16 @@ bootstrapServer <- function(id, control) {
     # Charakteristika bootstrapu
     output$hypothesis <- renderPrint({
       boot <- BootstrappedTask$result()
+      if (is.null(sud$sampleData$x2)) {
+        h0text <- "mu"
+      } else {
+        h0text <- "mu1 - mu2"
+      }
+
       glue(
-        "H0: mu = {control$H0}\n",
-        "T: {boot$observed_mean}\n",
-        "p-val.: {boot$p.value}\n"
+        "H0: {h0text} = {control$H0}\n",
+        "B: {test$statistic}\n",
+        "p-val.: {test$p.value}\n"
       )
     })
 

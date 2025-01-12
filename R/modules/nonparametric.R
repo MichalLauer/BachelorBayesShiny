@@ -77,9 +77,14 @@ nonparametricServer <- function(id, control) {
       sam <- sud$sampleData
       test <- conduct_wilcox_test(sam$x1, sam$x2, control)
       test.stat <- wilcox_test_stat(test, c = control, s = sam)
+      if (is.null(sam$x2)) {
+        h0text <- "median"
+      } else {
+        h0text <- "mu1 - mu2"
+      }
 
       glue(
-        "H0: mu = {control$H0}\n",
+        "H0: {h0text} = {control$H0}\n",
         "W: {test.stat}\n",
         "p-val.: {test$p.value}\n"
       )
