@@ -87,10 +87,14 @@ parametricServer <- function(id, control) {
     # Paralelizace
     SimulationTask <- ExtendedTask$new(function(pop, control) {
       future_promise({
+        if (control$use.seed) {
+          set.seed(control$seed + 1)
+        }
+
         errorI <- sapply(
           X = seq_len(control$K),
           FUN = \(i) {
-            s1 <- get_sample(d = pop$x1, c = control, i = i)
+            s1 <- get_sample(d = pop$x1, c = control)
             true_H0 <- pop$x1$mean()
             s2 <- NULL
             if (!is.null(pop$x2)) {
@@ -107,7 +111,7 @@ parametricServer <- function(id, control) {
         errorII <- sapply(
           X = seq_len(control$K),
           FUN = \(i) {
-            s1 <- get_sample(d = pop$x1, c = control, i = i)
+            s1 <- get_sample(d = pop$x1, c = control)
             s2 <- NULL
             if (!is.null(pop$x2)) {
               s2 <- get_sample(d = pop$x2, c = control)
@@ -115,7 +119,7 @@ parametricServer <- function(id, control) {
 
             # H1 v populaci platí. Zkoumám pravděpodobnost, že za platnosti H1
             # nezamítnu H0.
-            conduct_t_test(s1, s2, control, h0 = control$H0)$p.value >= control$alpha
+            conduct_t_test(s1, s2, control)$p.value >= control$alpha
           }
         ) |> mean()
 

@@ -1,8 +1,4 @@
-get_sample <- function(d, c, i = 0) {
-  if (c$use.seed) {
-    set.seed(c$seed + i)
-  }
-
+get_sample <- function(d, c) {
   sample <- d$rand(c$n)
 
   return(sample)

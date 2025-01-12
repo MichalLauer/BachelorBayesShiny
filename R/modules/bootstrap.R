@@ -21,7 +21,7 @@ bootstrapServer <- function(id, control) {
     BootstrappedTask <- ExtendedTask$new(function(sam, control) {
       future_promise({
         if (control$use.seed) {
-          set.seed(control$seed)
+          set.seed(control$seed + 4)
         }
 
         smpl <- sam$x1 - (sam$x2 %||% 0)
@@ -46,7 +46,7 @@ bootstrapServer <- function(id, control) {
     SimulationTask <- ExtendedTask$new(function(pop, control) {
       future_promise({
         if (control$use.seed) {
-          set.seed(control$seed)
+          set.seed(control$seed + 3)
         }
 
         errorI <- sapply(

@@ -5,5 +5,5 @@ get_xy <- function(d) {
   y <- d$pdf(x)
   n <- d$strprint()
 
-  return(list(x=x, y=y, n=n))
+  return(list(x = x, y = y, n = n))
 }
