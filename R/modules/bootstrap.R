@@ -141,8 +141,8 @@ bootstrapServer <- function(id, control) {
 
       glue(
         "H0: {h0text} = {control$H0}\n",
-        "B: {test$statistic}\n",
-        "p-val.: {test$p.value}\n"
+        "B: {boot$observed_mean}\n",
+        "p-val.: {boot$p.value}\n"
       )
     })
 
