@@ -20,19 +20,23 @@ bootstrapServer <- function(id, control) {
     # Paralelizace bootstrapu
     BootstrappedTask <- ExtendedTask$new(function(sam, control) {
       future_promise({
-        sample <- sam$x1 - (sam$x2 %||% 0)
+        if (control$use.seed) {
+          set.seed(control$seed)
+        }
+
+        smpl <- sam$x1 - (sam$x2 %||% 0)
+        observed_mean <- mean(smpl)
 
         means <- sapply(
           X = seq_len(control$B),
           FUN = \(i) {
-            set.seed(control$seed + i)
-            mean(sample(x = sample, size = length(sample), replace = TRUE))
+            mean(sample(x = smpl, size = length(smpl), replace = TRUE))
           }
         )
 
         list(
           means = means,
-          observed_mean = mean(sample),
+          observed_mean = observed_mean,
           p.value = mean(abs(means - mean(means)) >= abs(observed_mean - mean(means)))
         )
       }, seed = TRUE)
@@ -41,25 +45,32 @@ bootstrapServer <- function(id, control) {
     # Paralelizace simulací
     SimulationTask <- ExtendedTask$new(function(pop, control) {
       future_promise({
+        if (control$use.seed) {
+          set.seed(control$seed)
+        }
+
         errorI <- sapply(
           X = seq_len(control$K),
           FUN = \(i) {
-            set.seed(control$seed + i)
-            sample <- pop$x1$rand(control$n) - (pop$x2$rand(control$n) %||% 0)
+            smpl <- pop$x1$rand(control$n)
+            if (!is.null(pop$x2)) {
+              smpl <- smpl - pop$x2$rand(control$n)
+            }
 
             # Centrování
-            observed_mean <- mean(sample)
-            centered_sample <- sample - observed_mean + control$H0
+            observed_mean <- mean(smpl)
+            centered_sample <- smpl - observed_mean + control$H0
 
             means <- sapply(
               X = seq_len(control$B),
               FUN = \(i) {
-                set.seed(control$seed + i)
                 mean(sample(x = centered_sample,
                             size = length(centered_sample), replace = TRUE))
               }
             )
 
+            # H0 díky úpravě dat platí. Zkoumám pravděpodobnost, že zamítneme H0,
+            # která ve skutečnosti platí.
             p.value <- mean(abs(means - mean(means)) >= abs(observed_mean - mean(means)))
             p.value <= control$alpha
           }
@@ -68,24 +79,23 @@ bootstrapServer <- function(id, control) {
         errorII <- sapply(
           X = seq_len(control$K),
           FUN = \(i) {
-            set.seed(control$seed + i)
-            sample <- pop$x1$rand(control$n) - (pop$x2$rand(control$n) %||% 0)
-
-            # Centrování
-            observed_mean <- mean(sample)
-            centered_sample <- sample - observed_mean + control$H0
+            smpl <- pop$x1$rand(control$n)
+            if (!is.null(pop$x2)) {
+              smpl <- smpl - pop$x2$rand(control$n)
+            }
 
             means <- sapply(
               X = seq_len(control$B),
               FUN = \(i) {
-                set.seed(control$seed + i)
-                mean(sample(x = centered_sample,
-                            size = length(centered_sample), replace = TRUE))
+                mean(sample(x = smpl,
+                            size = length(smpl), replace = TRUE))
               }
             )
 
-            p.value <- mean(abs(means - mean(means)) >= abs(observed_mean - mean(means)))
-            p.value > control$alpha
+            # H1 v populaci platí. Zkoumám pravděpodobnost, že za platnosti H1
+            # nezamítnu H0.
+            p.value <- mean(abs(means - mean(means)) >= abs(control$H0 - mean(means)))
+            p.value >= control$alpha
           }
         ) |> mean()
 

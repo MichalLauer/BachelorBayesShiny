@@ -13,7 +13,6 @@ server <- function(input, output, session) {
   iv$add_rule("H0", sv_required("H0 je povinná."))
   iv$add_rule("paired", \(x) is_second_valid(x, input$distr2))
   iv$add_rule("var.equal", \(x) is_second_valid(x, input$distr2))
-  iv$add_rule("H1", sv_required("H1 je povinná."))
   iv$add_rule("K", sv_required("K je povinné."))
   iv$add_rule("K", sv_gte(1, "K musí být >= {rhs}."))
   iv$add_rule("K", sv_integer("K musí být celé číslo."))
