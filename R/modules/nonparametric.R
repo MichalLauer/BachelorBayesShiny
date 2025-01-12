@@ -100,6 +100,8 @@ nonparametricServer <- function(id, control) {
               true_H0 <- true_H0 - pop$x2$mean()
             }
 
+            # H0 díky úpravě dat platí. Zkoumám pravděpodobnost, že zamítná H0,
+            # která ve skutečnosti platí.
             conduct_wilcox_test(s1, s2, control, h0 = true_H0)$p.value <= control$alpha
           }
         ) |> mean()
@@ -113,7 +115,9 @@ nonparametricServer <- function(id, control) {
               s2 <- get_sample(d = pop$x2, c = control)
             }
 
-            conduct_wilcox_test(s1, s2, control, h0 = control$H1)$p.value >= control$alpha
+            # H1 v populaci platí. Zkoumám pravděpodobnost, že za platnosti H1
+            # nezamítnu H0.
+            conduct_wilcox_test(s1, s2, control, h0 = control$H0)$p.value >= control$alpha
           }
         ) |> mean()
 
