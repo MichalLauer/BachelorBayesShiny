@@ -1,24 +1,29 @@
 wilcox_test_stat <- function(test, c, s) {
+  W <- test$statistic
+
+  # Jednovýběrový test - vše je v pořádku
   if (is.null(s$x2)) {
-    W <- test$statistic
-    mu <- c$n*(c$n + 1)/4
-    s2 <- c$n*(c$n + 1)*(2*c$n + 1)/24
+    mu <- c$n * (c$n + 1) / 4
+    s2 <- c$n * (c$n + 1) * (2 * c$n + 1) / 24
+    return((W - mu) / sqrt(s2))
   } else {
     if (c$paired) {
-      d <- s$x1 - s$x2
-      d_nonzero <- d[d != 0]
-      n <- length(d_nonzero)
-      ranks <- rank(abs(d_nonzero))
-      signed_ranks <- ranks * sign(d_nonzero)
-      W <- sum(signed_ranks[signed_ranks > 0])
+      # Párový test - je nutné upravit W
+      # R používá minimum z W a n(n+1)/2 - W
+      W <- min(W, (c$n * (c$n + 1) / 2) - W)
       mu <- c$n * (c$n + 1) / 4
       s2 <- c$n * (c$n + 1) * (2 * c$n + 1) / 24
+      return((W - mu) / sqrt(s2))
     } else {
-      W <- test$statistic + c$n * (c$n + 1) / 2
-      mu <- c$n*(2*c$n + 1)/2
-      s2 <- c$n*c$n*(2*c$n + 1)/12
+      mu <- c$n * (c$n + c$n + 1) / 2
+      s2 <- c$n * c$n * (c$n + c$n + 1) / 12
+
+      # Vypočtení správné statistiky pro normalitu
+      combined <- c(s$x1, s$x2)
+      ranks <- rank(combined)
+      W <- sum(ranks[1:c$n])
+
+      return((W - mu) / sqrt(s2))
     }
   }
-
-  (W - mu) / sqrt(s2)
 }
